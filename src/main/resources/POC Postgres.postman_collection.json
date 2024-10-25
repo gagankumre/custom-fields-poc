@@ -1,0 +1,104 @@
+{
+	"info": {
+		"_postman_id": "38ecfd8e-6c06-4687-a0c6-dbc18a0d779e",
+		"name": "POC Postgres",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "17007995"
+	},
+	"item": [
+		{
+			"name": "create vendor",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"VendorName\",\n    \"vendorCode\": \"VEND001\",\n    \"paymentTerms\": \"NET30\",\n    \"reconAccount\": \"RECON123\",\n    \"address\": {\n        \"addressLine1\": \"123 Main St\",\n        \"city\": \"Metropolis\",\n        \"email\": \"vendor@example.com\"\n    },\n    \"bankDetail\": {\n        \"accountType\": \"Checking\",\n        \"accountNumber\": \"123456789\",\n        \"bankName\": \"Bank ABC\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/vendors?workspaceId=test-workspace-1&erpId=erp002",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"vendors"
+					],
+					"query": [
+						{
+							"key": "workspaceId",
+							"value": "test-workspace-1"
+						},
+						{
+							"key": "erpId",
+							"value": "erp002"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list vendor",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/vendors/list?workspaceId={{workspaceId}}&name={{vendorName}}&accountNumber={{accountNumber}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"vendors",
+						"list"
+					],
+					"query": [
+						{
+							"key": "workspaceId",
+							"value": "{{workspaceId}}"
+						},
+						{
+							"key": "erpId",
+							"value": "ERP123",
+							"disabled": true
+						},
+						{
+							"key": "name",
+							"value": "{{vendorName}}"
+						},
+						{
+							"key": "email",
+							"value": "skye.lesch@example.com",
+							"disabled": true
+						},
+						{
+							"key": "accountNumber",
+							"value": "{{accountNumber}}"
+						},
+						{
+							"key": "city",
+							"value": "Klockotown",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
