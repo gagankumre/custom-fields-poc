@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,6 +31,18 @@ public class VendorController {
                                                @RequestBody VendorCustomFields customField) {
         Vendor vendor = vendorService.createVendor(workspaceId, erpId, customField);
         return ResponseEntity.ok(vendor);
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<Vendor> getVendor(@PathVariable(name = "id") Long id) {
+        return ResponseEntity.ok(vendorService.getVendor(id));
+    }
+
+    @PutMapping("{id}/update")
+    public ResponseEntity<Vendor> createVendor(
+            @PathVariable(name = "id") Long id,
+            @RequestBody Vendor vendor) {
+        return ResponseEntity.ok(vendorService.updateVendor(id, vendor));
     }
 
     @GetMapping("/list")

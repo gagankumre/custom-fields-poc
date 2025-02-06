@@ -13,7 +13,7 @@ import java.util.List;
 @Component
 public class DataGeneratorAppRunner implements CommandLineRunner {
 
-    private static final int TOTAL_VENDORS = 100000;
+    private static final int TOTAL_VENDORS = 5;
     private static final boolean GENERATE_DATA = false; // Set to true to generate data on startup
 
     @Autowired

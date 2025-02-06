@@ -1,6 +1,7 @@
 package in.clear.http.util;
 
 import com.github.javafaker.Faker;
+import in.clear.http.model.VendorContact;
 import in.clear.http.model.customField.Address;
 import in.clear.http.model.customField.BankDetail;
 import in.clear.http.model.customField.VendorCustomFields;
@@ -34,12 +35,27 @@ public class DataGenerator {
             vendor.setWorkspaceId(WORKSPACE_IDS[random.nextInt(TOTAL_WORKSPACES)]);
             vendor.setErpId(faker.idNumber().valid());
             vendor.setCustomField(generateCustomFields());
+            vendor.setContacts(generateContacts());
 
             vendors.add(vendor);
         }
         System.out.println("commonNames: " + commonNames);
         System.out.println("commonAccountNumbers: " + commonAccountNumbers);
         return vendors;
+    }
+
+    private static List<VendorContact> generateContacts() {
+        List<VendorContact> contacts = new ArrayList<>();
+        for (int i = 0; i < random.nextInt(5); i++) {
+            VendorContact contact = new VendorContact();
+            contact.setName(faker.name().fullName());
+            contact.setEmail(faker.internet().emailAddress().split("@")[0] + "@" + EMAIL_DOMAINS[random.nextInt(EMAIL_DOMAINS.length)]);
+            contact.setPhoneNumber(faker.phoneNumber().phoneNumber());
+            contact.setDesignation(faker.company().profession());
+            contact.setDepartment(faker.company().profession());
+            contacts.add(contact);
+        }
+        return contacts;
     }
 
     private static VendorCustomFields generateCustomFields() {

@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
+import java.util.List;
 
 @Data
 @Entity
@@ -33,5 +34,9 @@ public class Vendor {
     @Type(type = "io.hypersistence.utils.hibernate.type.json.JsonType")
     @Column(columnDefinition = "jsonb", name = "custom_field")
     private VendorCustomFields customField;
+
+    @Type(type = "io.hypersistence.utils.hibernate.type.json.JsonType")
+    @Column(columnDefinition = "jsonb", name = "contacts")
+    private List<VendorContact> contacts;
 }
 
