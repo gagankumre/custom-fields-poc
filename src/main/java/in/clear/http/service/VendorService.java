@@ -35,11 +35,11 @@ public class VendorService {
 
     public Vendor updateVendor(Long id, Vendor newVendor) {
         Vendor vendor = vendorRepository.findById(id).orElseThrow();
-        javers.commit("fetchVendor", vendor);
+//        javers.commit("fetchVendor", vendor);
         vendor.setCustomField(newVendor.getCustomField());
         vendor.setErpId(newVendor.getErpId());
         vendor.setContacts(newVendor.getContacts());
-        return vendorRepository.save(newVendor);
+        return vendorRepository.save(vendor);
     }
 
     public void saveVendors(List<Vendor> vendors) {

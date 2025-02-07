@@ -4,22 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flipkart.zjsonpatch.JsonDiff;
 import in.clear.http.model.Vendor;
-import in.clear.http.repository.VendorRepository;
+import in.clear.http.repository.CustomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.TransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
-
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
 
 @Slf4j
 @Aspect
@@ -27,10 +18,7 @@ import javax.persistence.PersistenceContext;
 @RequiredArgsConstructor
 public class VendorAspect {
 
-    @PersistenceContext
-    private final EntityManager entityManager;
-    private final TransactionTemplate transactionTemplate;
-    private final VendorRepository vendorRepository;
+    private final CustomRepository customRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Around("execution(* in.clear.http.repository.VendorRepository.save(..)) && args(entity)")
@@ -39,7 +27,7 @@ public class VendorAspect {
             log.info("Aspect on saveVendorAspect was called {}", joinPoint.getSignature().getName());
             Long entityId = getTrackedEntityId(entity);
 
-            Vendor originalVendor = fetchOriginalVendorFromDb(entityId);
+            Vendor originalVendor = customRepository.fetchOriginalEntityFromDb(Vendor.class, entityId);
             JsonNode oldState = (originalVendor != null) ? objectMapper.valueToTree(originalVendor) : null;
 
             Object result = joinPoint.proceed();
@@ -51,16 +39,6 @@ public class VendorAspect {
             log.error("Error in saveVendorAspect with message {}", e.getMessage(), e);
         }
         return joinPoint.proceed();
-    }
-
-    private Vendor fetchOriginalVendorFromDb(Long vendorId) {
-        if (vendorId == null) {
-            return null;
-        }
-        return transactionTemplate.execute(status -> {
-            entityManager.clear(); // Clear the persistence context
-            return entityManager.find(Vendor.class, vendorId);
-        });
     }
 
     private JsonNode cloneEntityToJsonNode(Object entity) {
