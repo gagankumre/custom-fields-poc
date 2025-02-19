@@ -1,26 +1,12 @@
 package in.clear.http.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import in.clear.http.dto.InvoiceDTO;
 import in.clear.http.dto.LineItem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.javers.core.Javers;
-import org.javers.core.JaversBuilder;
-import org.javers.core.diff.Diff;
 import org.springframework.stereotype.Service;
 
-import javax.json.Json;
-import javax.json.JsonMergePatch;
-import javax.json.JsonObject;
-import javax.json.JsonPatch;
-import javax.json.JsonString;
-import javax.json.JsonStructure;
-import javax.json.JsonValue;
 import java.util.List;
-
-import static org.javers.common.string.ToStringBuilder.format;
 
 @Slf4j
 @Service
@@ -28,7 +14,6 @@ import static org.javers.common.string.ToStringBuilder.format;
 public class InvoiceService {
 
     public static void main(String[] args) {
-        Javers javers = JaversBuilder.javers().build();
 
 //        SCAuditEvent<String> auditEvent = SCAuditEvent.<String>builder()
 //                .identifier("1")
@@ -74,12 +59,6 @@ public class InvoiceService {
                 .lineItems(List.of(lineItem2))
                 .build();
 
-
-        Diff diff = javers.compare(invoiceDTO, invoiceDTOUpdated);
-
-        diff.getChanges().forEach(change -> {
-            System.out.println(change.getClass().getSimpleName() + ": " + change);
-        });
 
 //        ObjectMapper mapper = new ObjectMapper();
 //        JsonStructure source = mapper.convertValue(invoiceDTO, JsonStructure.class);

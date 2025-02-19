@@ -6,7 +6,6 @@ import in.clear.http.repository.VendorRepository;
 import in.clear.http.repository.specification.VendorSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.javers.core.Javers;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class VendorService {
-
-    private final Javers javers;
 
     private final VendorRepository vendorRepository;
 
@@ -35,7 +32,6 @@ public class VendorService {
 
     public Vendor updateVendor(Long id, Vendor newVendor) {
         Vendor vendor = vendorRepository.findById(id).orElseThrow();
-//        javers.commit("fetchVendor", vendor);
         vendor.setCustomField(newVendor.getCustomField());
         vendor.setErpId(newVendor.getErpId());
         vendor.setContacts(newVendor.getContacts());

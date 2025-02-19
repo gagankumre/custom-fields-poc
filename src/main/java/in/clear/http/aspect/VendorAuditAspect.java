@@ -2,9 +2,12 @@ package in.clear.http.aspect;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.flipkart.zjsonpatch.JsonDiff;
+import in.clear.http.dto.VendorAuditDTO;
+import in.clear.http.dto.audit.SCAuditEventRequest;
+import in.clear.http.mapper.VendorMapper;
 import in.clear.http.model.Vendor;
-import in.clear.http.repository.CustomRepository;
+import in.clear.http.repository.auditSdk.CustomRepository;
+import in.clear.http.service.SCAuditService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -16,10 +19,12 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class VendorAspect {
+public class VendorAuditAspect {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final CustomRepository customRepository;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final SCAuditService scAuditService;
 
     @Around("execution(* in.clear.http.repository.VendorRepository.save(..)) && args(entity)")
     public Object saveVendorAspect(ProceedingJoinPoint joinPoint, Object entity) throws Throwable {
@@ -28,12 +33,16 @@ public class VendorAspect {
             Long entityId = getTrackedEntityId(entity);
 
             Vendor originalVendor = customRepository.fetchOriginalEntityFromDb(Vendor.class, entityId);
-            JsonNode oldState = (originalVendor != null) ? objectMapper.valueToTree(originalVendor) : null;
+            JsonNode oldState = cloneObjectToJsonNode(creteVendorAuditDTO(originalVendor));
 
             Object result = joinPoint.proceed();
-            JsonNode newState = objectMapper.valueToTree(entity);
-            JsonNode diff = JsonDiff.asJson(oldState, newState);
-            sendAuditLogToMicroservice(entityId, oldState, newState, diff);
+
+            var savedVendor = (Vendor) result;
+
+            JsonNode newState = cloneObjectToJsonNode(creteVendorAuditDTO((Vendor) entity));
+
+            sendAuditLogToMicroservice(savedVendor.getId(), oldState, newState);
+
             return result;
         } catch (Exception e) {
             log.error("Error in saveVendorAspect with message {}", e.getMessage(), e);
@@ -41,8 +50,12 @@ public class VendorAspect {
         return joinPoint.proceed();
     }
 
-    private JsonNode cloneEntityToJsonNode(Object entity) {
-        return objectMapper.valueToTree(entity); // Converts entity to immutable JsonNode
+    private VendorAuditDTO creteVendorAuditDTO(Vendor vendor) {
+        return VendorMapper.INSTANCE.toVendorAuditDTO(vendor);
+    }
+
+    private JsonNode cloneObjectToJsonNode(Object object) {
+        return (object != null) ? objectMapper.valueToTree(object) : null;
     }
 
     private Long getTrackedEntityId(Object entity) {
@@ -53,10 +66,14 @@ public class VendorAspect {
         }
     }
 
-    private void sendAuditLogToMicroservice(Long entityId, JsonNode oldState, JsonNode newState, JsonNode diff) {
-        System.out.printf("Audit Log for Entity ID: %s%n", entityId);
-        System.out.printf("Old State: %s%n", oldState.toPrettyString());
-        System.out.printf("New State: %s%n", newState.toPrettyString());
-        System.out.printf("Diff: %s%n", diff.toPrettyString());
+    private void sendAuditLogToMicroservice(Long entityId, JsonNode oldState, JsonNode newState) {
+        SCAuditEventRequest scAuditEventRequest = SCAuditEventRequest.builder()
+                .entityId(entityId.toString())
+                .currentData(newState)
+                .previousData(oldState)
+                .actor("GD")
+                .eventTypeId(1L)
+                .build();
+        scAuditService.logAuditEvent(scAuditEventRequest);
     }
 }

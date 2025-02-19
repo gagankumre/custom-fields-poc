@@ -3,7 +3,6 @@ package in.clear.http.dto;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.Entity;;
 import java.util.List;
 
 @Data

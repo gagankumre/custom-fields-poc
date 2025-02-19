@@ -1,7 +1,10 @@
 package in.clear.http.model;
 
 import in.clear.http.model.customField.VendorCustomFields;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
@@ -15,6 +18,9 @@ import java.util.List;
 
 @Data
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "vendor",
         indexes = {
                 @Index(name = "IDX_workspace", columnList = "workspace_id"),

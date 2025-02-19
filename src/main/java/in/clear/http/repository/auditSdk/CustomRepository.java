@@ -1,4 +1,4 @@
-package in.clear.http.repository;
+package in.clear.http.repository.auditSdk;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
